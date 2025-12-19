@@ -1,0 +1,25 @@
+{
+  "name": "volt-factory",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "docx-pdf": "^0.0.1",
+    "docxtemplater": "^3.67.6",
+    "express": "^5.2.1",
+    "pizzip": "^3.2.0",
+    "puppeteer": "^24.33.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
