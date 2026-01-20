@@ -15,6 +15,16 @@ export const generateContractPdf = async (data) => {
     "contract.html"
   );
 
+  const monto = Number(data.monto_numero);
+
+  if (isNaN(monto)) {
+    throw new Error("monto_numero inválido");
+  }
+  
+  const porcentaje20 = monto * 0.2;
+  const porcentaje50 = monto * 0.5;
+  const porcentaje10 = monto * 0.1;
+
   try {
     const rutaImagen = path.join(__dirname, '..', 'asset', 'logoVolt.png');
 
@@ -26,13 +36,15 @@ export const generateContractPdf = async (data) => {
   } catch (error) {
     console.error("Error al leer la imagen:", error.message);
   }
+
+
   //Variables de porcentajes de pago
-  data.monto_veinte = data.monto_numero * 0.2
-  data.monto_cincuenta = data.monto_numero * 0.5
-  data.monto_diez = data.monto_numero * 0.1
+  data.monto_veinte = porcentaje20
+  data.monto_cincuenta = porcentaje50
+  data.monto_diez = porcentaje10
 
   let html = fs.readFileSync(templatePath, "utf8");
-	
+
   console.log("Se procede a cargar las variables al contrato...");
   for (const key in data) {
     //console.log(data[key])
@@ -41,12 +53,12 @@ export const generateContractPdf = async (data) => {
 
   const browser = await puppeteer.launch({
     headless: "new",
-  	args: [
-    	"--no-sandbox",
-    	"--disable-setuid-sandbox",
-    	"--disable-dev-shm-usage",
-   		"--disable-gpu"
-  	]
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu"
+    ]
   });
 
   const page = await browser.newPage();
@@ -54,16 +66,16 @@ export const generateContractPdf = async (data) => {
   await page.setContent(html, { waitUntil: "load" });
 
   const safeName = data.nombre
-  .normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "")
-  .replace(/\s+/g, "_");
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "_");
   const fileName = `Contrato-${safeName.split(" ", 0)}-${safeName.split(" ", 1)}-${datePart}.pdf`;
   const outputPath = path.join(
     process.cwd(),
     "src",
     "generated",
     fileName
-  );w
+  );
   console.log("Generando PDF con datos...");
   await page.pdf({
     path: outputPath,
