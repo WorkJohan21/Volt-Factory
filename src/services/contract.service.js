@@ -20,7 +20,7 @@ export const generateContractPdf = async (data) => {
   if (isNaN(monto)) {
     throw new Error("monto_numero inválido");
   }
-  
+
   const porcentaje20 = monto * 0.2;
   const porcentaje50 = monto * 0.5;
   const porcentaje10 = monto * 0.1;
@@ -37,6 +37,55 @@ export const generateContractPdf = async (data) => {
     console.error("Error al leer la imagen:", error.message);
   }
 
+  //DESGLOSE DE SUMINISTROS
+  const equipos = []
+
+  //Modulos Fotovoltaicos
+  if (Number(data.cant_paneles > 0)) {
+    equipos.push(`
+    <tr>
+      <td><b>Paneles Fotovoltaicos</b></td>
+      <td>${data.cant_paneles}</td>
+      <td>${data.descripcion_paneles}</td>
+    </tr>
+  `);
+  }
+
+  //Microinversor normal
+  if (Number(data.cant_microinversor > 0)) {
+    equipos.push(`
+    <tr>
+      <td><b>Microinversor</b></td>
+      <td>${data.cant_microinversor}</td>
+      <td>${data.descripcion_microinversor}</td>
+    </tr>
+  `);
+  }
+
+  //Microinversor hibrido
+  if (Number(data.cant_hibrido > 0)) {
+    equipos.push(`
+    <tr>
+      <td><b>Microinversor Híbrido</b></td>
+      <td>${data.cant_hibrido}</td>
+      <td>${data.descripcion_hibrido}</td>
+    </tr>
+  `);
+  }
+
+  //Baterias
+  if (Number(data.cant_bateria > 0)) {
+    equipos.push(`
+    <tr>
+      <td><b>Baterias</b></td>
+      <td>${data.cant_bateria}</td>
+      <td>${data.descripcion_bateria}</td>
+    </tr>
+  `);
+  }
+
+  //Variable para la tabla de equipos
+  data.equipos_html = equipos.join("");
 
   //Variables de porcentajes de pago
   data.monto_veinte = porcentaje20
@@ -82,7 +131,7 @@ export const generateContractPdf = async (data) => {
     format: "A4",
     printBackground: true,
   });
-
+  console.log("Contrato generado con exito!");
   await browser.close();
 
   return encodeURI(`/contracts/${fileName}`);

@@ -213,26 +213,16 @@
 
   <p class="section-title">TERCERA: DESGLOSE DE SUMINISTROS</p>
   <table>
-    <tr>
-      <th>Equipo</th>
-      <th>Cantidad</th>
-      <th>Descripción</th>
-    </tr>
-    <tr>
-      <td>Módulos Fotovoltaicos</td>
-      <td>{{cant_modulos}}</td>
-      <td>Paneles de {{potencia_modulos}} W</td>
-    </tr>
-    <tr>
-      <td>Inversor / Microinversor</td>
-      <td>{{cant_inversor}}</td>
-      <td>{{potencia_inversor}} Wh</td>
-    </tr>
-    <tr>
-      <td>Batería de Litio LifePo</td>
-      <td>{{cant_bateria}}</td>
-      <td>{{potencia_bateria}} Wh</td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Equipo</th>
+        <th>Cantidad</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{equipos_html}}
+    </tbody>
   </table>
   <p>
     <strong>PARAGRAFO:</strong>
@@ -738,26 +728,16 @@
   <p>A continuación, se detallan los elementos entregados:</p>
 
   <table>
-    <tr>
-      <th>Equipo</th>
-      <th>Cantidad</th>
-      <th>Descripcion</th>
-    </tr>
-    <tr class="highlight-row">
-      <td><strong>Módulos Fotovoltaicos</strong></td>
-      <td>{{cant_modulos}}</td>
-      <td>Paneles de {{potencia_modulos}} W</td>
-    </tr>
-    <tr>
-      <td><strong>(Inversor/microinversor)</strong></td>
-      <td>{{cant_inversor}}</td>
-      <td>{{potencia_inversor}} wh</td>
-    </tr>
-    <tr>
-      <td><strong>Batería de Litio LifePo</strong></td>
-      <td>{{cant_bateria}}</td>
-      <td>Paneles de {{potencia_bateria}} W</td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Equipo</th>
+        <th>Cantidad</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{equipos_html}}
+    </tbody>
   </table>
 
   <p class="section-title">2. Firma de Confirmación</p>
