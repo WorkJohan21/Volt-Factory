@@ -88,9 +88,9 @@ export const generateContractPdf = async (data) => {
   data.equipos_html = equipos.join("");
 
   //Variables de porcentajes de pago
-  data.monto_veinte = porcentaje20
-  data.monto_cincuenta = porcentaje50
-  data.monto_diez = porcentaje10
+  data.monto_veinte = porcentaje20.toFixed(2)
+  data.monto_cincuenta = porcentaje50.toFixed(2)
+  data.monto_diez = porcentaje10.toFixed(2)
 
   let html = fs.readFileSync(templatePath, "utf8");
 
@@ -134,5 +134,5 @@ export const generateContractPdf = async (data) => {
   console.log("Contrato generado con exito!");
   await browser.close();
 
-  return encodeURI(`/contracts/${fileName}`);
+  return encodeURI(`http://server.volt-factory.com:3001/contracts/${fileName}`);
 };
