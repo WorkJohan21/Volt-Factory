@@ -91,6 +91,19 @@ export const generateContractPdf = async (data) => {
   data.monto_veinte = porcentaje20.toFixed(2)
   data.monto_cincuenta = porcentaje50.toFixed(2)
   data.monto_diez = porcentaje10.toFixed(2)
+  data.monto_numero = monto.toFixed(2)
+
+  //Validacion de genero
+  if (data.genero === "M"){
+    data.genero = "Hombre"
+  }
+  else if (data.genero === "F"){
+    data.genero = "Mujer"
+  }
+  else {
+    data.genero = ""
+  }
+
 
   let html = fs.readFileSync(templatePath, "utf8");
 
