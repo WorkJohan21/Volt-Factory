@@ -9,6 +9,7 @@ console.log(">>> Registrando rutas /volt");
 app.use("/volt", contractRoutes);
 app.post("/test", (req, res) => res.send("OK"));
 app.use("/contracts", express.static("src/generated"));
+app.use("/contracts-word", express.static("src/generated-word"));
 
 app.listen(3001, () => {
   console.log("Servidor corriendo en Puerto 3001");

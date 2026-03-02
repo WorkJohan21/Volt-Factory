@@ -2,8 +2,10 @@ import fs from "fs";
 import path from "path";
 import puppeteer from "puppeteer";
 import { fileURLToPath } from 'url';
+import PizZip from "pizzip";
+import Docxtemplater from "docxtemplater";
 
-export const generateContractPdf = async (data) => {
+export const generateContactDocuments = async (data) => {
 
   const datePart = new Date().toISOString().split('T')[0];
   const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +15,19 @@ export const generateContractPdf = async (data) => {
     "src",
     "template",
     "contract.html"
+  );
+
+  const templatePathWord = path.join(
+    process.cwd(),
+    "src",
+    "template",
+    "contract-template.docx"
+  );
+
+  const pdfFolder = path.join(
+    process.cwd(),
+    "src",
+    "generated"
   );
 
   const monto = Number(data.monto_numero);
@@ -41,7 +56,7 @@ export const generateContractPdf = async (data) => {
   const equipos = []
 
   //Modulos Fotovoltaicos
-  if (Number(data.cant_paneles > 0)) {
+  if (Number(data.cant_paneles) > 0) {
     equipos.push(`
     <tr>
       <td><b>Paneles Fotovoltaicos</b></td>
@@ -94,10 +109,10 @@ export const generateContractPdf = async (data) => {
   data.monto_numero = monto.toFixed(2)
 
   //Validacion de genero
-  if (data.genero === "M"){
+  if (data.genero === "M") {
     data.genero = "Hombre"
   }
-  else if (data.genero === "F"){
+  else if (data.genero === "F") {
     data.genero = "Mujer"
   }
   else {
@@ -113,6 +128,7 @@ export const generateContractPdf = async (data) => {
     html = html.replaceAll(`{{${key}}}`, data[key]);
   }
 
+  //Generacion de PDF
   const browser = await puppeteer.launch({
     headless: "new",
     args: [
@@ -131,21 +147,126 @@ export const generateContractPdf = async (data) => {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "_");
-  const fileName = `Contrato-${safeName.split(" ", 0)}-${safeName.split(" ", 1)}-${datePart}.pdf`;
-  const outputPath = path.join(
+
+  const fileName = `Contrato-${safeName.split(" ", 0)}-${safeName.split(" ", 1)}-${datePart}`;
+  const pdfFileName = `${fileName}.pdf`;
+  const wordFileName = `${fileName}.docx`;
+
+  const pdfPath = path.join(
     process.cwd(),
     "src",
     "generated",
-    fileName
+    pdfFileName
   );
   console.log("Generando PDF con datos...");
   await page.pdf({
-    path: outputPath,
+    path: pdfPath,
     format: "A4",
     printBackground: true,
   });
-  console.log("Contrato generado con exito!");
+  console.log("Contrato PDF generado con exito!");
   await browser.close();
 
-  return encodeURI(`http://server.volt-factory.com:3001/contracts/${fileName}`);
+
+  //Generacion de Word
+  const contentWord = fs.readFileSync(templatePathWord, "binary");
+
+  const zip = new PizZip(contentWord);
+
+  const doc = new Docxtemplater(zip, {
+    paragraphLoop: true,
+    linebreaks: true,
+  });
+
+  console.log("Generando WORD con datos...");
+
+  // Prepara array dinámico de equipos
+  const equiposWord = [];
+
+  if (Number(data.cant_paneles) > 0) {
+    equiposWord.push({
+      nombre_equipo: "Paneles Fotovoltaicos",
+      cantidad: data.cant_paneles,
+      descripcion: data.descripcion_paneles
+    });
+  }
+
+  if (Number(data.cant_microinversor) > 0) {
+    equiposWord.push({
+      nombre_equipo: "Microinversor",
+      cantidad: data.cant_microinversor,
+      descripcion: data.descripcion_microinversor
+    });
+  }
+
+  if (Number(data.cant_bateria) > 0) {
+    equiposWord.push({
+      nombre_equipo: "Baterías",
+      cantidad: data.cant_bateria,
+      descripcion: data.descripcion_bateria
+    });
+  }
+
+  if (Number(data.cant_hibrido) > 0) {
+    equiposWord.push({
+      nombre_equipo: "Microinversor Hibrido",
+      cantidad: data.cant_hibrido,
+      descripcion: data.descripcion_hibrido
+    });
+  }
+
+  // Renderiza variables
+  doc.render({
+    nombre: data.nombre,
+    numero_doc: data.numero_doc,
+    tipo_doc: data.tipo_doc,
+    nacionalidad: data.nacionalidad,
+    ubicacion: data.ubicacion,
+    calle: data.calle,
+    distrito: data.distrito,
+    provincia: data.provincia,
+    produccion_anual: data.produccion_anual,
+    monto_letras: data.monto_letras,
+    telefono: data.telefono,
+    correo: data.correo,
+    dia: data.dia,
+    mes: data.mes,
+    anio: data.anio,
+    genero: data.genero,
+    monto_mantenimiento: data.monto_mantenimiento,
+    monto_letras_mantenimiento: data.monto_letras_mantenimiento,
+    monto_numero: data.monto_numero,
+    monto_veinte: data.monto_veinte,
+    monto_cincuenta: data.monto_cincuenta,
+    monto_diez: data.monto_diez,
+    equipos_word: equiposWord
+  });
+
+  const buffer = doc.getZip().generate({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+  });
+
+
+  const wordFolder = path.join(
+    process.cwd(),
+    "src",
+    "generated-word",
+    wordFileName
+  );
+
+  try {
+    fs.writeFileSync(wordFolder, buffer);
+    console.log("Contrato WORD generado con exito!");
+  }
+  catch (error) {
+    console.error("Error al generar WORD:", error.message);
+  }
+
+
+
+  return {
+    pdfUrl: encodeURI(`http://server.volt-factory.com:3001/contracts/${pdfFileName}`),
+    wordUrl: encodeURI(`http://server.volt-factory.com:3001/contracts-word/${wordFileName}`)
+  };
 };

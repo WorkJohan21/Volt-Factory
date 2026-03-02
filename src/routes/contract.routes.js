@@ -1,11 +1,11 @@
 import express from "express";
-import { generateContractPdf } from "../services/contract.service.js";
+import { generateContactDocuments } from "../services/contract.service.js";
 
 const router = express.Router();
 
 router.post("/contract/create", async (req, res) => {
   try {
-    const url = await generateContractPdf(req.body);
+    const url = await generateContactDocuments(req.body);
     res.json({ url });
   } catch (err) {
     console.error(err);
